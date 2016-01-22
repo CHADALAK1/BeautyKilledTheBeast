@@ -58,9 +58,60 @@ void ABeautyKilledTheBeastCharacter::SetupPlayerInputComponent(class UInputCompo
 	InputComponent->BindAxis("MoveRight", this, &ABeautyKilledTheBeastCharacter::MoveRight);
 }
 
+FHitResult ABeautyKilledTheBeastCharacter::Trace(const FVector & TraceFrom, const FVector & TraceTo) const
+{
+
+	static FName WallTraceTag = FName(TEXT("WallTrace"));
+
+	FCollisionQueryParams TraceParams(WallTraceTag, true, Instigator);
+	TraceParams.bTraceAsyncScene = true;
+	TraceParams.bReturnPhysicalMaterial = true;
+	TraceParams.AddIgnoredActor(this);
+
+	FHitResult Hit(ForceInit);
+
+	GetWorld()->LineTraceSingleByChannel(Hit, TraceFrom, TraceTo, WALL_TRACE, TraceParams);
+
+	return Hit;
+}
+
+void ABeautyKilledTheBeastCharacter::ProcessWallTrace(const FHitResult & Impact, const FVector & Origin, const FVector & Dir)
+{
+	const FVector EndTrace = Origin + Dir * 50;
+	const FVector Endpoint = Impact.GetActor() ? Impact.ImpactPoint : EndTrace;
+
+	AStaticMeshActor *Wall = Cast<AStaticMeshActor>(Impact.GetActor());
+	if (Wall)
+	{
+		if (Wall->ActorHasTag("Wall"))
+		{
+			bCanWallJump = true;
+		}
+	}
+	else
+	{
+		bCanWallJump = false;
+	}
+}
+
 void ABeautyKilledTheBeastCharacter::SetMaxHealth(int32 NewMax)
 {
     MaxHealth = NewMax;
+}
+
+void ABeautyKilledTheBeastCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	WallCheck();
+
+}
+
+void ABeautyKilledTheBeastCharacter::SetHealth(int32 NewHealth)
+{
+	if (NewHealth <= MaxHealth || NewHealth >= 0)
+	{
+		Health = NewHealth;
+	}
 }
 
 void ABeautyKilledTheBeastCharacter::AddHealth(int32 Add)
@@ -92,6 +143,18 @@ float ABeautyKilledTheBeastCharacter::GetHealthPercentage()
     return FMath::GetRangePct(0, GetMaxHealth(), GetHealth());
 }
 
+void ABeautyKilledTheBeastCharacter::WallCheck()
+{
+	const FVector Start = GetMesh()->GetSocketLocation("WallSocket");
+	const FVector Dir = GetMesh()->GetSocketRotation("WallSocket").Vector();
+	const FVector End = Start + Dir * 40;
+	const FHitResult Impact = Trace(Start, End);
+	DrawDebugLine(GetWorld(), Start, End, FColor::Green);
+
+	ProcessWallTrace(Impact, Start, Dir);
+
+}
+
 void ABeautyKilledTheBeastCharacter::MeleeAttack()
 {
     
@@ -104,6 +167,29 @@ void ABeautyKilledTheBeastCharacter::Dash()
         GetCharacterMovement()->Velocity += GetCapsuleComponent()->GetForwardVector() * 3000.f;
         DashCooldown();
     }
+}
+
+void ABeautyKilledTheBeastCharacter::JumpAction()
+{
+	if (!CanWallJump())
+	{
+		Jump();
+	}
+	else
+	{
+		if (GetCharacterMovement()->IsFalling())
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, "WallJump");
+			GetController()->DisableInput(GetWorld()->GetFirstPlayerController());
+			LaunchCharacter((GetActorUpVector() * 1000 + GetActorForwardVector() * -1000), false, true);
+			SetActorRotation(FRotator(GetActorRotation().Pitch, GetActorRotation().Yaw + 180, GetActorRotation().Roll));
+			GetController()->EnableInput(GetWorld()->GetFirstPlayerController());
+		}
+		else
+		{
+			Jump();
+		}
+	}
 }
 
 void ABeautyKilledTheBeastCharacter::DashCooldown()
