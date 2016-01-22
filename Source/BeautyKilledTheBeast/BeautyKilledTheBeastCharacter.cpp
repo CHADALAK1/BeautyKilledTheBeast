@@ -120,7 +120,7 @@ void ABeautyKilledTheBeastCharacter::EnableDash()
 
 void ABeautyKilledTheBeastCharacter::Kill()
 {
-    Destroy(this);
+    //Destroy(this);
 }
 
 void ABeautyKilledTheBeastCharacter::MoveRight(float Value)
