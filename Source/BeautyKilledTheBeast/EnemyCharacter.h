@@ -9,7 +9,7 @@
  * 
  */
 UCLASS()
-class BEAUTYKILLEDTHEBEAST_API AEnemyCharacter : public ABeautyKilledTheBeastCharacter
+class BEAUTYKILLEDTHEBEAST_API AEnemyCharacter : public ACharacter
 {
 	GENERATED_BODY()
 	

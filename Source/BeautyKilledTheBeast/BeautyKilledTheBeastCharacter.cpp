@@ -58,6 +58,12 @@ void ABeautyKilledTheBeastCharacter::SetupPlayerInputComponent(class UInputCompo
 	InputComponent->BindAxis("MoveRight", this, &ABeautyKilledTheBeastCharacter::MoveRight);
 }
 
+void ABeautyKilledTheBeastCharacter::BeginPlay()
+{
+	AWeapon *Weap = GetWorld()->SpawnActor<AWeapon>(TempWeap);
+	Weap->AttachRootComponentTo(GetMesh(), "WeapSocket", EAttachLocation::SnapToTarget);
+}
+
 FHitResult ABeautyKilledTheBeastCharacter::Trace(const FVector & TraceFrom, const FVector & TraceTo) const
 {
 
@@ -157,7 +163,7 @@ void ABeautyKilledTheBeastCharacter::WallCheck()
 
 void ABeautyKilledTheBeastCharacter::MeleeAttack()
 {
-    
+	bIsAttacking = true;
 }
 
 void ABeautyKilledTheBeastCharacter::Dash()

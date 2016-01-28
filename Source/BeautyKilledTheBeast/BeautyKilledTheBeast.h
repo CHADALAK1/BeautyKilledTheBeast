@@ -4,5 +4,6 @@
 #define __BEAUTYKILLEDTHEBEAST_H__
 
 #include "Engine.h"
+#include "BeautyKilledTheBeastCharacter.h"
 				   
 #endif

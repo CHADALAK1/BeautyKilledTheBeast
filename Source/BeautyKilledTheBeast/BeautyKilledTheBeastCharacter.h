@@ -1,6 +1,7 @@
 // Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
 #pragma once
 #include "GameFramework/Character.h"
+#include "Weapon.h"
 #include "BeautyKilledTheBeastCharacter.generated.h"
 
 #define WALL_TRACE ECC_GameTraceChannel1
@@ -61,6 +62,13 @@ public:
     void SetMaxHealth(int32 NewMax);
 
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void BeginPlay() override;
+
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	TSubclassOf<AWeapon> TempWeap;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharConditions")
+	uint32 bIsAttacking : 1;
     
 private:
     
