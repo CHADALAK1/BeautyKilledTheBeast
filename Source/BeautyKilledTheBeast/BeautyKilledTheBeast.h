@@ -5,5 +5,6 @@
 
 #include "Engine.h"
 #include "BeautyKilledTheBeastCharacter.h"
+#include "EnemyCharacter.h"
 				   
 #endif

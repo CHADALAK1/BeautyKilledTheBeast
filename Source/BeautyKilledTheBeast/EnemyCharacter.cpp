@@ -4,5 +4,21 @@
 #include "EnemyCharacter.h"
 
 
+AEnemyCharacter::AEnemyCharacter()
+{
+	Health = 40;
+	MaxHealth = 40;
+	bIsAttacking = false;
+}
+
+void AEnemyCharacter::Attack()
+{
+	bIsAttacking = true;
+}
+
+float AEnemyCharacter::GetHealthPercentage()
+{
+	return FMath::GetRangePct(0, GetMaxHealth(), GetHealth());
+}
 
 
